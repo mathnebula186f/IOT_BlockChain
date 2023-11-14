@@ -1,25 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
+// App.jsx
 
-function App() {
+import React from "react";
+import { useUser } from "./UserContext";
+import HomePage from "./HomePage";
+import Register from "./Register";
+
+const App = () => {
+  const { accountType, userAccount, web3 } = useUser();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1 className="text-3xl">Address: {userAccount}</h1>
+      {accountType !== "no" ? (
+        <HomePage
+          accountType={accountType}
+          userAccount={userAccount}
+        />
+      ) : (
+        <Register
+          userAccount={userAccount}
+        />
+      )}
     </div>
   );
-}
+};
 
 export default App;
