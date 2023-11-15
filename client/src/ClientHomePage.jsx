@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Web3 from "web3";
 import Contract from "./Contract/Contract.json";
+import State0Client from "./State0Client";
+import State1Client from "./State1Client";
+import State2Client from "./State2Client";
+import State3Client from "./State3Client";
+import Verdict from "./Verdict";
 
 export default function ClientHomePage({ userAccount }) {
   const [services, setServices] = useState([]);
@@ -133,25 +138,59 @@ export default function ClientHomePage({ userAccount }) {
           </div>
         </>
       ) : (
-        <>
-          <h2 className="text-xl font-bold mb-2">
-            Requested Service Information:
-          </h2>
-          {requestInfo ? (
-            <div className="border p-4 rounded-md shadow-md">
-              <p className="text-lg font-semibold mb-2">
-                Request ID: {requestID.toString()}
-              </p>
-              {/* Display the information fetched from the smart contract */}
-              <p>State: {Number(requestInfo.state)}</p>
-              <p>From: {requestInfo.from}</p>
-              <p>To: {requestInfo.to}</p>
-              <p>Service ID: {Number(requestInfo.serviceID)}</p>
-            </div>
+        <div>
+          {requestInfo && Number(requestInfo.state) === 0 ? (
+            <State0Client
+              requestID={requestInfo.requestID}
+              state={requestInfo.state}
+              from={requestInfo.from}
+              to={requestInfo.to}
+              serviceID={requestInfo.serviceID}
+            />
           ) : (
-            <p>Loading request information...</p>
+            <div> Loading ...</div>
           )}
-        </>
+          {requestInfo && Number(requestInfo.state) === 1 ? (
+            <State1Client
+              requestID={requestInfo.requestID}
+              state={requestInfo.state}
+              from={requestInfo.from}
+              to={requestInfo.to}
+              serviceID={requestInfo.serviceID}
+            />
+          ) : (
+            <div> Loading ...</div>
+          )}
+          {requestInfo && Number(requestInfo.state) === 2 ? (
+            <State2Client
+              requestID={requestInfo.requestID}
+              state={requestInfo.state}
+              from={requestInfo.from}
+              to={requestInfo.to}
+              serviceID={requestInfo.serviceID}
+            />
+          ) : (
+            <div> Loading ...</div>
+          )}
+          {requestInfo && Number(requestInfo.state) === 3 ? (
+            <State3Client
+              requestID={requestInfo.requestID}
+              state={requestInfo.state}
+              from={requestInfo.from}
+              to={requestInfo.to}
+              serviceID={requestInfo.serviceID}
+            />
+          ) : (
+            <div> Loading ...</div>
+          )}
+          {requestInfo && Number(requestInfo.state) === 4 ? (
+            <Verdict
+              verdict={requestInfo.verdict}
+            />
+          ) : (
+            <div> Loading ...</div>
+          )}
+        </div>
       )}
     </div>
   );

@@ -16,6 +16,7 @@ contract Contract {
         string name;
         uint serviceID;
         address serviceProviderAddress;
+        string s1;
     }
 
     struct Client {
@@ -31,6 +32,7 @@ contract Contract {
         address from;
         address to;
         uint serviceID;
+        string verdict;
     }
 
     uint public serviceProviderCount;
@@ -57,7 +59,8 @@ contract Contract {
             hashS2: _hash2,  // Placeholder, replace with the actual hash value
             name: _name2,
             serviceID: serviceCount,
-            serviceProviderAddress:msg.sender
+            serviceProviderAddress:msg.sender,
+            s1:""
         });
 
     }
@@ -97,7 +100,8 @@ contract Contract {
             state: 0,  // You can set the initial state as needed
             from: msg.sender,
             to: serviceProviderAddress,
-            serviceID: _serviceID
+            serviceID: _serviceID,
+            verdict:"No"
         });
 
         // Update requested service in ServiceProvider
@@ -121,5 +125,91 @@ contract Contract {
         require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
         return requests[_requestID];
     }
-    
+    modifier onlyIfVerdictIsNo(uint _requestID) {
+        require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
+        require(keccak256(abi.encodePacked(requests[_requestID].verdict)) == keccak256(abi.encodePacked("No")), "Verdict must be 'No'");
+        _;
+    }
+    function setHashS2(uint _requestID, bytes32 _hashS2) external onlyIfVerdictIsNo(_requestID){
+        require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
+        // Find the corresponding service ID from the request
+        uint serviceID = requests[_requestID].serviceID;
+
+        // Update HashS2 for the service
+        services[serviceID].hashS2 = _hashS2;
+
+        // Update the state of the request
+        requests[_requestID].state++;
+    }
+
+    function displayHashS2(uint _serviceID) external view returns (bytes32) {
+        require(_serviceID > 0 && _serviceID <= serviceCount, "Invalid service ID");
+        return services[_serviceID].hashS2;
+    }
+
+    function confirmHashS2(uint _requestID) external onlyIfVerdictIsNo(_requestID) {
+        require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
+
+        // Update the state of the request
+        requests[_requestID].state++;
+    }
+     function declineRequest(uint _requestID) external onlyIfVerdictIsNo(_requestID){
+        require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
+
+        // Update the state of the request to 4
+        requests[_requestID].state = 4;
+
+        // Check if the requester is a client or a service provider
+        if (clients[msg.sender].clientAddress != address(0)) {
+            // If it is a client, update the verdict to "AbortByClient"
+            requests[_requestID].verdict = "AbortByClient";
+        } else if (serviceProviders[msg.sender].serviceProviderAddress != address(0)) {
+            // If it is a service provider, update the verdict to "AbortByServiceProvider"
+            requests[_requestID].verdict = "AbortByServiceProvider";
+        }
+    }
+
+    function publishS1(uint _requestID, string calldata _s1) external onlyIfVerdictIsNo(_requestID){
+        require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
+
+        // Find the corresponding service ID from the request
+        uint serviceID = requests[_requestID].serviceID;
+        requests[_requestID].state++;
+        // Update S1 for the service
+        services[serviceID].s1 = _s1;
+    }
+
+    function displayS1(uint _requestID) external view returns (string memory) {
+        require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
+
+        // Find the corresponding service ID from the request
+        uint serviceID = requests[_requestID].serviceID;
+
+        // Return the S1 parameter of the service
+        return services[serviceID].s1;
+    }
+
+     function confirmS1(uint _requestID) external onlyIfVerdictIsNo(_requestID) {
+        require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
+
+        // Update the state of the request
+        requests[_requestID].state++;
+
+        // Update the verdict to "Success"
+        requests[_requestID].verdict = "Success";
+    }
+
+    function resetClient() external {
+        require(clients[msg.sender].clientAddress != address(0), "Only clients can reset");
+
+        // Update the requestID of the client to 0
+        clients[msg.sender].requestID = 0;
+    }
+
+    function resetSp() external {
+        require(serviceProviders[msg.sender].serviceProviderAddress != address(0), "Only service providers can reset");
+
+        // Update the requestID of the service provider to 0
+        serviceProviders[msg.sender].requestID = 0;
+    }
 }

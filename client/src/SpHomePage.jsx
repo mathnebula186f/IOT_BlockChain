@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Web3 from "web3";
 import Contract from "./Contract/Contract.json";
+import State0Sp from "./State0Sp";
+import State1Sp from "./State1Sp";
+import State2Sp from "./State2Sp";
+import State3Sp from "./State3Sp";
+import Verdict from "./Verdict";
 
 const SpHomePage = ({ userAccount }) => {
   const [requestID, setRequestID] = useState(0);
@@ -58,18 +63,55 @@ const SpHomePage = ({ userAccount }) => {
       {requestID === 0 ? (
         <p className="font-bold text-red-500">No Current Requests</p>
       ) : (
-        <div className="bg-gray-200 p-4 rounded-md shadow-md">
-          <p className="font-bold text-blue-500 mb-2">Request Information:</p>
-          {requestInfo ? (
-            <div>
-              <p>Request ID: {requestID}</p>
-              <p>State: {Number(requestInfo.state)}</p>
-              <p>From: {requestInfo.from}</p>
-              <p>To: {requestInfo.to}</p>
-              <p>Service ID: {Number(requestInfo.serviceID)}</p>
-            </div>
+        <div>
+          {requestInfo && Number(requestInfo.state) === 0 ? (
+            <State0Sp
+              requestID={requestInfo.requestID}
+              state={requestInfo.state}
+              from={requestInfo.from}
+              to={requestInfo.to}
+              serviceID={requestInfo.serviceID}
+            />
           ) : (
-            <p>Loading request information...</p>
+            <div>Loading ...</div>
+          )}
+          {requestInfo && Number(requestInfo.state) === 1 ? (
+            <State1Sp
+              requestID={requestInfo.requestID}
+              state={requestInfo.state}
+              from={requestInfo.from}
+              to={requestInfo.to}
+              serviceID={requestInfo.serviceID}
+            />
+          ) : (
+            <div>Loading ...</div>
+          )}
+          {requestInfo && Number(requestInfo.state) === 2 ? (
+            <State2Sp
+              requestID={requestInfo.requestID}
+              state={requestInfo.state}
+              from={requestInfo.from}
+              to={requestInfo.to}
+              serviceID={requestInfo.serviceID}
+            />
+          ) : (
+            <div>Loading ...</div>
+          )}
+          {requestInfo && Number(requestInfo.state) === 3 ? (
+            <State3Sp
+              requestID={requestInfo.requestID}
+              state={requestInfo.state}
+              from={requestInfo.from}
+              to={requestInfo.to}
+              serviceID={requestInfo.serviceID}
+            />
+          ) : (
+            <div>Loading ...</div>
+          )}
+          {requestInfo && Number(requestInfo.state) === 4 ? (
+            <Verdict verdict={requestInfo.verdict} />
+          ) : (
+            <div> Loading ...</div>
           )}
         </div>
       )}
