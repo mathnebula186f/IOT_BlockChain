@@ -3,10 +3,10 @@ import Web3 from "web3";
 import Contract from "./Contract/Contract.json"
 
 export default function State2Sp( requestInfo ) {
-  const [s1Value, setS1Value] = useState("");
-  const [isS1Published, setIsS1Published] = useState(false);
+  const [s2Value, setS2Value] = useState("");
+  const [isS2Published, setIsS2Published] = useState(false);
 
-  const handlePublishS1 = async () => {
+  const handlePublishS2 = async () => {
     // Implement logic to publish S1 (e.g., call a function to update the contract)
 
     // For demonstration purposes, let's just log the S1 value and set isS1Published to true
@@ -20,10 +20,10 @@ export default function State2Sp( requestInfo ) {
     );
 
     await contract.methods
-      .publishS1(requestInfo.requestID,s1Value)
+      .publishS2(requestInfo.requestID,s2Value)
       .send({ from: requestInfo.to, gas: 2000000, gasPrice: 10000000000 });
-    console.log("S1:", s1Value);
-    setIsS1Published(true);
+    console.log("S2:", s2Value);
+    setIsS2Published(true);
     window.location.reload();
   };
 
@@ -38,38 +38,38 @@ export default function State2Sp( requestInfo ) {
           <p>To: {requestInfo.to}</p>
           <p>Service ID: {Number(requestInfo.serviceID)}</p>
 
-          {/* Form for S1 */}
+          {/* Form for S2 */}
           <form>
             <label
-              htmlFor="s1"
+              htmlFor="s2"
               className="block text-sm font-medium text-gray-700"
             >
-              S1:
+              S2:
             </label>
             <input
               type="text"
-              id="s1"
-              name="s1"
-              value={s1Value}
-              onChange={(e) => setS1Value(e.target.value)}
+              id="s2"
+              name="s2"
+              value={s2Value}
+              onChange={(e) => setS2Value(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full"
             />
             <button
               type="button"
-              onClick={handlePublishS1}
+              onClick={handlePublishS2}
               className={`mt-4 p-2 transition-colors duration-300 ease-in-out ${
-                isS1Published
+                isS2Published
                   ? "bg-gray-300 text-gray-800 cursor-not-allowed"
                   : "bg-blue-500 text-white hover:bg-gray-300 hover:text-gray-800"
               } rounded-md`}
-              disabled={isS1Published}
+              disabled={isS2Published}
             >
-              {isS1Published ? "S1 Published" : "Publish S1"}
+              {isS2Published ? "S2 Published" : "Publish S2"}
             </button>
           </form>
 
           <h1>
-            Client Has Approved HashS2 and We are going to publish S1 On Chain
+            Client Has Approved HashS1 and We are going to publish S2 On Chain
           </h1>
         </div>
       ) : (

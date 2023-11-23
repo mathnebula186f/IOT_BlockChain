@@ -3,8 +3,34 @@ import Web3 from "web3";
 import Contract from "./Contract/Contract.json"
 
 export default function State0Sp( requestInfo ) {
-  const [hashS2, setHashS2] = useState("");
+  const [hashS1, setHashS1] = useState("");
   const [isPublished, setIsPublished] = useState(false);
+  const [s1, setS1] = useState("");
+
+  const calculateHash = () => {
+    const data = {
+      s1: s1,
+    };
+    console.log("heheh")
+    fetch("http://localhost:8080/singlehash", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const calculatedHashS = data.singleHash;
+        console.log("im here")
+        setHashS1(calculatedHashS);
+        //console.log("ok")
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        //console.log("hahah");
+      });
+  };
 
   const handlePublishHash = async () => {
     // Implement logic to publish hashS2 (e.g., call a function to update the contract)
@@ -20,9 +46,9 @@ export default function State0Sp( requestInfo ) {
     );
 
     await contract.methods
-      .setHashS2(requestInfo.requestID,hashS2)
+      .setHashS1(requestInfo.requestID,hashS1)
       .send({ from: requestInfo.to, gas: 2000000, gasPrice: 10000000000 });
-    console.log("HashS2:", hashS2);
+    console.log("HashS2:", hashS1);
     setIsPublished(true);
     window.location.reload();
   };
@@ -41,17 +67,17 @@ export default function State0Sp( requestInfo ) {
           {/* Form for HashS2 */}
           <form>
             <label
-              htmlFor="hashS2"
+              htmlFor="hashS1"
               className="block text-sm font-medium text-gray-700"
             >
-              HashS2:
+              HashS1:
             </label>
             <input
               type="text"
-              id="hashS2"
-              name="hashS2"
-              value={hashS2}
-              onChange={(e) => setHashS2(e.target.value)}
+              // id="hashS2"
+              // name="hashS2"
+              value={hashS1}
+              onChange={(e) => setHashS1(e.target.value)}
               className="mt-1 p-2 border border-gray-300 rounded-md w-full"
             />
             <button
@@ -66,6 +92,24 @@ export default function State0Sp( requestInfo ) {
               {isPublished ? "Hash Published" : "Publish Hash"}
             </button>
           </form>
+          <form>
+            <label htmlFor="s1">Input S1:</label>
+            <input
+              type="text"
+              id="s1"
+              name="s1"
+              value={s1}
+              onChange={(e) => setS1(e.target.value)}
+              required
+            />
+            <br />
+
+            <button type="button" onClick={calculateHash}>
+              Submit
+            </button>
+          </form>
+
+          <div id="result">HashS: {hashS1}</div>
         </div>
       ) : (
         <p>Loading request information...</p>

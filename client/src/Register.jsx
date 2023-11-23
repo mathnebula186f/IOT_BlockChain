@@ -8,7 +8,33 @@ const Register = ({ userAccount }) => {
   const [serviceProviderName, setServiceProviderName] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [hashS, setHashS] = useState("");
-  const [hashS2, setHashS2] = useState("");
+
+   const [s1, setS1] = useState("");
+   const [s2, setS2] = useState("");
+   const [hhashS, setHhashS] = useState("");
+
+   const calculateHash = () => {
+     const data = {
+       s1: s1,
+       s2: s2,
+     };
+
+     fetch("http://localhost:8080/combine", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify(data),
+     })
+       .then((response) => response.json())
+       .then((data) => {
+         const calculatedHashS = data.combinedHash;
+         setHashS(calculatedHashS);
+       })
+       .catch((error) => {
+         console.error("Error:", error);
+       });
+   };
 
   const registerAsServiceProvider = async () => {
     const provider = new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545");
@@ -22,12 +48,12 @@ const Register = ({ userAccount }) => {
 
     try {
       await window.ethereum.request({ method: "eth_requestAccounts" });
+      console.log("hashS is=",hashS);
       await contract.methods
         .registerServiceProvider(
           serviceProviderName,
           serviceName,
-          hashS,
-          hashS2
+          hashS
         )
         .send({
           from: userAccount,
@@ -35,7 +61,7 @@ const Register = ({ userAccount }) => {
           gasPrice: 10000000000,
         });
       console.log("Service provider registered successfully");
-      window.location.reload();
+      //window.location.reload();
     } catch (error) {
       console.error("Error registering service provider:", error);
     }
@@ -103,17 +129,6 @@ const Register = ({ userAccount }) => {
             />
           </label>
         </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-600">
-            HashS2:
-            <input
-              className="form-input mt-1 block w-full"
-              type="text"
-              value={hashS2}
-              onChange={(e) => setHashS2(e.target.value)}
-            />
-          </label>
-        </div>
         <button
           type="button"
           onClick={registerAsServiceProvider}
@@ -133,6 +148,35 @@ const Register = ({ userAccount }) => {
           Register as Client
         </button>
       </form>
+      <form>
+        <label htmlFor="s1">Input S1:</label>
+        <input
+          type="text"
+          id="s1"
+          name="s1"
+          value={s1}
+          onChange={(e) => setS1(e.target.value)}
+          required
+        />
+        <br />
+
+        <label htmlFor="s2">Input S2:</label>
+        <input
+          type="text"
+          id="s2"
+          name="s2"
+          value={s2}
+          onChange={(e) => setS2(e.target.value)}
+          required
+        />
+        <br />
+
+        <button type="button" onClick={calculateHash}>
+          Submit
+        </button>
+      </form>
+
+      <div id="result">HashS: {hashS}</div>
     </div>
   );
 };

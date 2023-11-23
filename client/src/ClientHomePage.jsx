@@ -5,7 +5,7 @@ import State0Client from "./State0Client";
 import State1Client from "./State1Client";
 import State2Client from "./State2Client";
 import State3Client from "./State3Client";
-import Verdict from "./Verdict";
+import VerdictClient from "./VerdictClient";
 
 export default function ClientHomePage({ userAccount }) {
   const [services, setServices] = useState([]);
@@ -184,8 +184,9 @@ export default function ClientHomePage({ userAccount }) {
             <div> Loading ...</div>
           )}
           {requestInfo && Number(requestInfo.state) === 4 ? (
-            <Verdict
+            <VerdictClient
               verdict={requestInfo.verdict}
+              from={requestInfo.from}
             />
           ) : (
             <div> Loading ...</div>

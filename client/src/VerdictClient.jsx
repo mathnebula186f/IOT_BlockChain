@@ -1,4 +1,26 @@
-export default function Verdict(requestInfo){
+import Web3 from "web3";
+import Contract from "./Contract/Contract.json"
+
+export default function VerdictClient(requestInfo){
+    async function resetUser(){
+      const provider = new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545");
+      const web3 = new Web3(provider);
+      const networkId = await web3.eth.net.getId();
+      const deployedNetwork = Contract.networks[networkId];
+      const contract = new web3.eth.Contract(
+        Contract.abi,
+        deployedNetwork.address
+      );
+      console.log("heheheheheh")
+      await contract.methods
+        .resetUser()
+        .send({
+          from: requestInfo.from,
+          gas: 2000000,
+          gasPrice: 10000000000,
+        });
+        window.location.reload();
+    }
     return (
       <div>
         {requestInfo && requestInfo.verdict === "Success" ? (
@@ -26,6 +48,7 @@ export default function Verdict(requestInfo){
         ) : (
           <div>Loading....</div>
         )}
+        <button onClick={resetUser}>Go to Homepage</button>
       </div>
     );
 }

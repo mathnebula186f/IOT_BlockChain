@@ -16,7 +16,7 @@ export default function State2Client(requestInfo) {
             <p>To: {requestInfo.to}</p>
             <p>Service ID: {Number(requestInfo.serviceID)}</p>
             <h1 className="text-5xl">
-              We Have Confirmed HashS2 and Now Waiting For Service Provider to Give S1
+              We Have Confirmed HashS1 and Now Waiting For Service Provider to Give S2
             </h1>
           </div>
         ) : (

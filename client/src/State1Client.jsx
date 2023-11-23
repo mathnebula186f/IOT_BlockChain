@@ -3,11 +3,11 @@ import Web3 from "web3";
 import Contract from "./Contract/Contract.json";
 
 export default function State1Client(requestInfo ) {
-  const [hashS2, setHashS2] = useState("");
-  const [isHashS2Confirmed, setIsHashS2Confirmed] = useState(false);
+  const [hashS1, setHashS1] = useState("");
+  const [isHashS1Confirmed, setIsHashS1Confirmed] = useState(false);
 
   useEffect(() => {
-    const fetchHashS2 = async () => {
+    const fetchHashS1 = async () => {
       try {
         // Connect to the local Ethereum testnet (adjust as needed)
         const provider = new Web3.providers.HttpProvider(
@@ -22,25 +22,25 @@ export default function State1Client(requestInfo ) {
         );
 
         // Check requested service for the client
-        const fetchedHashS2 = await contract.methods
-          .displayHashS2(requestInfo.serviceID)
+        const fetchedHashS1 = await contract.methods
+          .displayHashS1(requestInfo.serviceID)
           .call({
             from: requestInfo.from,
           });
         //console.log("requested id=",clientRequestedServiceID)
         //setRequestID(Number(clientRequestID));
         // Update the state with the fetched HashS2
-        setHashS2(fetchedHashS2);
+        setHashS1(fetchedHashS1);
       } catch (error) {
-        console.error("Error fetching HashS2:", error);
+        console.error("Error fetching HashS1:", error);
       }
     };
 
     // Fetch HashS2 when the component mounts
-    fetchHashS2();
+    fetchHashS1();
   }, [requestInfo.serviceID]);
 
-  const handleConfirmHashS2 = async () => {
+  const handleConfirmHashS1 = async () => {
     try {
       const provider = new Web3.providers.HttpProvider("HTTP://127.0.0.1:7545");
       const web3 = new Web3(provider);
@@ -52,14 +52,14 @@ export default function State1Client(requestInfo ) {
       );
 
       await contract.methods
-        .confirmHashS2(requestInfo.requestID)
+        .confirmHashS1(requestInfo.requestID)
         .send({ from: requestInfo.to, gas: 2000000, gasPrice: 10000000000 });
 
       // Update the state to indicate that HashS2 is confirmed
-      setIsHashS2Confirmed(true);
+      setIsHashS1Confirmed(true);
       window.location.reload();
     } catch (error) {
-      console.error("Error confirming HashS2:", error);
+      console.error("Error confirming HashS1:", error);
     }
   };
 
@@ -82,22 +82,22 @@ export default function State1Client(requestInfo ) {
 
             {/* Display HashS2 */}
             <div className="mt-4">
-              <p className="text-lg font-semibold mb-2">HashS2:</p>
-              <p className="break-all">{hashS2 || "Waiting for HashS2..."}</p>
+              <p className="text-lg font-semibold mb-2">HashS1:</p>
+              <p className="break-all">{hashS1 || "Waiting for HashS2..."}</p>
             </div>
 
-            {/* Confirm HashS2 button */}
+            {/* Confirm HashS1 button */}
             <button
               type="button"
-              onClick={handleConfirmHashS2}
+              onClick={handleConfirmHashS1}
               className={`mt-4 p-2 transition-colors duration-300 ease-in-out ${
-                isHashS2Confirmed
+                isHashS1Confirmed
                   ? "bg-gray-300 text-gray-800 cursor-not-allowed"
                   : "bg-green-500 text-white hover:bg-gray-300 hover:text-gray-800"
               } rounded-md`}
-              disabled={isHashS2Confirmed}
+              disabled={isHashS1Confirmed}
             >
-              {isHashS2Confirmed ? "HashS2 Confirmed" : "Confirm HashS2"}
+              {isHashS1Confirmed ? "HashS1 Confirmed" : "Confirm HashS1"}
             </button>
           </div>
         ) : (

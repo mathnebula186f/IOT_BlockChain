@@ -5,7 +5,7 @@ import State0Sp from "./State0Sp";
 import State1Sp from "./State1Sp";
 import State2Sp from "./State2Sp";
 import State3Sp from "./State3Sp";
-import Verdict from "./Verdict";
+import VerdictSp from "./VerdictSp";
 
 const SpHomePage = ({ userAccount }) => {
   const [requestID, setRequestID] = useState(0);
@@ -109,7 +109,10 @@ const SpHomePage = ({ userAccount }) => {
             <div>Loading ...</div>
           )}
           {requestInfo && Number(requestInfo.state) === 4 ? (
-            <Verdict verdict={requestInfo.verdict} />
+            <VerdictSp 
+            verdict={requestInfo.verdict} 
+            to={requestInfo.to}
+            />
           ) : (
             <div> Loading ...</div>
           )}

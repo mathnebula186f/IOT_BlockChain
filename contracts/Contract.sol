@@ -11,12 +11,12 @@ contract Contract {
     }
 
     struct Service {
-        bytes32 hashS;
-        bytes32 hashS2;
+        string hashS;
+        string hashS1;
         string name;
         uint serviceID;
         address serviceProviderAddress;
-        string s1;
+        string s2;
     }
 
     struct Client {
@@ -45,7 +45,7 @@ contract Contract {
     mapping(address => Client) private clients;
     mapping(uint => Request) private requests;
 
-    function registerServiceProvider(string calldata _name1, string calldata _name2, bytes32 _hash1,bytes32 _hash2) external {
+    function registerServiceProvider(string calldata _name1, string calldata _name2, string calldata _hash1) external {
         serviceProviderCount++;
         serviceProviders[msg.sender] = ServiceProvider({
             serviceProviderAddress: msg.sender,
@@ -56,11 +56,11 @@ contract Contract {
         serviceCount++;
         services[serviceCount] = Service({
             hashS: _hash1,  // Placeholder, replace with the actual hash value
-            hashS2: _hash2,  // Placeholder, replace with the actual hash value
+            hashS1: "",  // Placeholder, replace with the actual hash value
             name: _name2,
             serviceID: serviceCount,
             serviceProviderAddress:msg.sender,
-            s1:""
+            s2:""
         });
 
     }
@@ -130,24 +130,24 @@ contract Contract {
         require(keccak256(abi.encodePacked(requests[_requestID].verdict)) == keccak256(abi.encodePacked("No")), "Verdict must be 'No'");
         _;
     }
-    function setHashS2(uint _requestID, bytes32 _hashS2) external onlyIfVerdictIsNo(_requestID){
+    function setHashS1(uint _requestID, string calldata _hashS1) external onlyIfVerdictIsNo(_requestID){
         require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
         // Find the corresponding service ID from the request
         uint serviceID = requests[_requestID].serviceID;
 
         // Update HashS2 for the service
-        services[serviceID].hashS2 = _hashS2;
+        services[serviceID].hashS1 = _hashS1;
 
         // Update the state of the request
         requests[_requestID].state++;
     }
 
-    function displayHashS2(uint _serviceID) external view returns (bytes32) {
+    function displayHashS1(uint _serviceID) external view returns (string memory) {
         require(_serviceID > 0 && _serviceID <= serviceCount, "Invalid service ID");
-        return services[_serviceID].hashS2;
+        return services[_serviceID].hashS1;
     }
 
-    function confirmHashS2(uint _requestID) external onlyIfVerdictIsNo(_requestID) {
+    function confirmHashS1(uint _requestID) external onlyIfVerdictIsNo(_requestID) {
         require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
 
         // Update the state of the request
@@ -169,27 +169,27 @@ contract Contract {
         }
     }
 
-    function publishS1(uint _requestID, string calldata _s1) external onlyIfVerdictIsNo(_requestID){
+    function publishS2(uint _requestID, string calldata _s2) external onlyIfVerdictIsNo(_requestID){
         require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
 
         // Find the corresponding service ID from the request
         uint serviceID = requests[_requestID].serviceID;
         requests[_requestID].state++;
         // Update S1 for the service
-        services[serviceID].s1 = _s1;
+        services[serviceID].s2 = _s2;
     }
 
-    function displayS1(uint _requestID) external view returns (string memory) {
+    function displayS2(uint _requestID) external view returns (string memory) {
         require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
 
         // Find the corresponding service ID from the request
         uint serviceID = requests[_requestID].serviceID;
 
         // Return the S1 parameter of the service
-        return services[serviceID].s1;
+        return services[serviceID].s2;
     }
 
-     function confirmS1(uint _requestID) external onlyIfVerdictIsNo(_requestID) {
+     function confirmS2(uint _requestID) external onlyIfVerdictIsNo(_requestID) {
         require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
 
         // Update the state of the request
@@ -199,17 +199,45 @@ contract Contract {
         requests[_requestID].verdict = "Success";
     }
 
-    function resetClient() external {
-        require(clients[msg.sender].clientAddress != address(0), "Only clients can reset");
+    // function resetClient() external {
+    //     require(clients[msg.sender].clientAddress != address(0), "Only clients can reset");
 
-        // Update the requestID of the client to 0
-        clients[msg.sender].requestID = 0;
+    //     // Update the requestID of the client to 0
+    //     clients[msg.sender].requestID = 0;
+    // }
+
+    // function resetSp() external {
+    //     require(serviceProviders[msg.sender].serviceProviderAddress != address(0), "Only service providers can reset");
+
+    //     // Update the requestID of the service provider to 0
+    //     serviceProviders[msg.sender].requestID = 0;
+    // }
+    function resetUser() external {
+        if (clients[msg.sender].clientAddress != address(0)) {
+            // If it is a client, update the verdict to "AbortByClient"
+            clients[msg.sender].requestID = 0;
+        } else if (serviceProviders[msg.sender].serviceProviderAddress != address(0)) {
+            // If it is a service provider, update the verdict to "AbortByServiceProvider"
+            serviceProviders[msg.sender].requestID = 0;
+        }
     }
+    
+    function computeVerdict(string calldata _s, uint _requestID) external  returns (string memory) {
+        require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
 
-    function resetSp() external {
-        require(serviceProviders[msg.sender].serviceProviderAddress != address(0), "Only service providers can reset");
+        // Find the corresponding service ID from the request
+        uint serviceID = requests[_requestID].serviceID;
 
-        // Update the requestID of the service provider to 0
-        serviceProviders[msg.sender].requestID = 0;
+        // Compute the hashS for the service
+        string memory computedHashS = services[serviceID].hashS;
+        //requests[_requestID].state++;
+        // Compare the computed hashS with the input string _s
+        if (keccak256(abi.encodePacked(computedHashS)) == keccak256(abi.encodePacked(_s))) {
+            requests[_requestID].verdict = "MaliciousClient";
+            return "Yes"; // Match
+        } else {
+            requests[_requestID].verdict = "MaliciousServiceProvider";
+            return "No"; // No match
+        }
     }
 }
