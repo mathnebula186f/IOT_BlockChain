@@ -1,10 +1,11 @@
 package main
 
 import (
-	"encoding/hex"
+	// "encoding/hex"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"strings"
+	// "strings"
 
 	"net/http"
 	// "reflect"
@@ -102,17 +103,17 @@ type Input struct {
 }
 
 type Output struct {
-	CombinedHash string `json:"combinedHash"`
-	SingleHash   string `json:"singleHash"`
+	CombinedHash []byte `json:"combinedHash"`
+	SingleHash   []byte `json:"singleHash"`
 }
 
 type InputCombineWithHash struct {
-	HashS1 string `json:"hashS1"`
+	HashS1 []byte `json:"hashS1"`
 	S2     string `json:"s2"`
 }
 
 type OutputCombineWithHash struct {
-	CombinedHash string `json:"combinedHash"`
+	CombinedHash []byte `json:"combinedHash"`
 }
 
 func handleRequest(w http.ResponseWriter, r *http.Request) {
@@ -138,7 +139,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		hash.Add([]byte(input.S1))
 		hash.Add([]byte(input.S2))
 
-		combinedHash := string(hash.Sum(nil))
+		combinedHash := (hash.Sum(nil))
 
 		// Calculate the lthash of a single string
 		singleHash := calculateSingleHash("example_string")
@@ -148,8 +149,8 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 			SingleHash:   singleHash,
 		}
 
-		fmt.Println("Combined Hash:", output.CombinedHash)
-		fmt.Println("Single Hash:", output.SingleHash)
+		fmt.Println("Combined Hash of Register Page:", output.CombinedHash)
+		fmt.Println("Single Hash of S1:", output.SingleHash)
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(output)
@@ -158,10 +159,10 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func calculateSingleHash(inputString string) string {
+func calculateSingleHash(inputString string) []byte {
 	hash := New16()
 	hash.Add([]byte(inputString))
-	return string(hash.Sum(nil))
+	return hash.Sum(nil)
 }
 
 func handleSingleHashRequest(w http.ResponseWriter, r *http.Request) {
@@ -186,8 +187,15 @@ func handleSingleHashRequest(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Calculate the lthash of the single string
-		singleHash := calculateSingleHash(input.SingleString)
-		combinedHash := calculateSingleHash("haha")
+		combinedHash := calculateSingleHash(input.SingleString)
+		//combinedHash := calculateSingleHash("haha")
+		hash := New16()
+		// hash.Add([]byte(input.S1))
+		// hash.Add([]byte("HAHA"))
+		hash.Add([]byte(input.SingleString))
+
+		singleHash := hash.Sum(nil)
+		
 
 		output := Output{
 			CombinedHash: combinedHash,
@@ -233,53 +241,53 @@ func readFromFile(filename string) (string, error) {
 	}
 	return string(content), nil
 }
-func Makehash(inputString1 string,inputString2 string ) string{
-		str1 := inputString1
-		h:=New16()
-		h.Add([]byte("hello"))
-		s11:=string(h.Sum(nil))
-		hash:=New16()
-		str2 := s11
-	// str2 := "Hello, World!"
+// func Makehash(inputString1 string,inputString2 string ) string{
+// 		str1 := inputString1
+// 		h:=New16()
+// 		h.Add([]byte("hello"))
+// 		s11:=string(h.Sum(nil))
+// 		hash:=New16()
+// 		str2 := s11
+// 	// str2 := "Hello, World!"
 
 
-		var validCharacters strings.Builder
+// 		var validCharacters strings.Builder
 
-	for i, c := range str1 {
-		 fmt.Printf("Index %d: Character: %c (Hex: %x, Unicode: %U)\n", i,c , c, c)
-	}
+// 	for i, c := range str1 {
+// 		 fmt.Printf("Index %d: Character: %c (Hex: %x, Unicode: %U)\n", i,c , c, c)
+// 	}
 
-	// Get the final concatenated string with valid characters
-	resultString := validCharacters.String()
-	fmt.Println("Result String:", resultString)
-	// 	length:=len(inputString1)
-	// fmt.Println("Our length=",length)
-		inputString1 = resultString
-		hash.SetState([]byte(inputString1))
-		fmt.Println("Hereee=",inputString1)
-	length:=len(inputString1)
-	fmt.Println("Our length=",length)
-	length1:=len((s11))
-	fmt.Println("Our length=",length1)
-	fmt.Println("strings1=",inputString1,"strings2=",s11)
-	fmt.Println("String1=",hex.EncodeToString([]byte(inputString1)),"\nstring 2=",hex.EncodeToString([]byte(s11)))
-	if(string([]byte(inputString1))==string(h.Sum(nil))){
-		fmt.Println("Love day lg gye!")
-	}
+// 	// Get the final concatenated string with valid characters
+// 	resultString := validCharacters.String()
+// 	fmt.Println("Result String:", resultString)
+// 	// 	length:=len(inputString1)
+// 	// fmt.Println("Our length=",length)
+// 		inputString1 = resultString
+// 		hash.SetState([]byte(inputString1))
+// 		fmt.Println("Hereee=",inputString1)
+// 	length:=len(inputString1)
+// 	fmt.Println("Our length=",length)
+// 	length1:=len((s11))
+// 	fmt.Println("Our length=",length1)
+// 	fmt.Println("strings1=",inputString1,"strings2=",s11)
+// 	fmt.Println("String1=",hex.EncodeToString([]byte(inputString1)),"\nstring 2=",hex.EncodeToString([]byte(s11)))
+// 	if(string([]byte(inputString1))==string(h.Sum(nil))){
+// 		fmt.Println("Love day lg gye!")
+// 	}
 
 
-	for i, c := range str2 {
-		fmt.Printf("Character %d: %c (Unicode: %U)\n",i,c,c)
-	}
-	fmt.Println("Alnkrit here is the answer=",string(hash.Sum(nil)))
-	s1:=hash.Sum(nil)
-	hash1:=New16()
-	hash1.SetState([]byte(s1))
-	fmt.Println("Alnkrit here is the answer 111=",string(hash1.Sum(nil)))
-	hash.Add([]byte(inputString2))
-	return "Yes"
+// 	for i, c := range str2 {
+// 		fmt.Printf("Character %d: %c (Unicode: %U)\n",i,c,c)
+// 	}
+// 	fmt.Println("Alnkrit here is the answer=",string(hash.Sum(nil)))
+// 	s1:=hash.Sum(nil)
+// 	hash1:=New16()
+// 	hash1.SetState([]byte(s1))
+// 	fmt.Println("Alnkrit here is the answer 111=",string(hash1.Sum(nil)))
+// 	hash.Add([]byte(inputString2))
+// 	return "Yes"
 	
-}
+// }
 
 func handleCombineWithHashRequest(w http.ResponseWriter, r *http.Request) {
 	// Enable CORS for all routes
@@ -304,18 +312,24 @@ func handleCombineWithHashRequest(w http.ResponseWriter, r *http.Request) {
 		
 
 		// Initialize lthash with HashS2
-		hashes:=Makehash(input.HashS1,input.S2)
+		// hashes:=Makehash(input.HashS1,input.S2)
 		
-		fmt.Println("here Yes",hashes)
-		fmt.Printf("Here is the value = %x\n", input.HashS1)
+		// fmt.Println("here Yes",hashes)
+		// fmt.Printf("Here is the value = %x\n", input.HashS1)
 
-		hash := New16()
+		// hash := New16()
+		// hash.SetState([]byte(input.HashS1))
+		// s11 := hex.EncodeToString(hash.Sum(nil))
+		// fmt.Printf("Here is the value = %s\n", s11)
+		// if(s11==input.HashS1){
+		// 	fmt.Println("Yes")
+		// }
+		fmt.Println("Original=",[]byte(input.HashS1))
+		data,err:=base64.StdEncoding.DecodeString(string(input.HashS1))
+		fmt.Println("We have finally recieved hello as ",data,"ok ok",err)
+		hash:=New16()
 		hash.SetState([]byte(input.HashS1))
-		s11 := hex.EncodeToString(hash.Sum(nil))
-		fmt.Printf("Here is the value = %s\n", s11)
-		if(s11==input.HashS1){
-			fmt.Println("Yes")
-		}
+		hash.Add([]byte(input.S2))
 		
 		// Combine HashS2 with S1
 		// time.Sleep(1 * time.Second)
@@ -326,7 +340,7 @@ func handleCombineWithHashRequest(w http.ResponseWriter, r *http.Request) {
 		// fmt.Println("Here is  s2=",input.S2)
 		//fmt.Println("this is the answer=",string(hash.Sum(nil)))
 		output := OutputCombineWithHash{
-			CombinedHash: string(hash.Sum(nil)),
+			CombinedHash: hash.Sum(nil),
 		}
 		
 		// fmt.Println("Heheh")
@@ -342,19 +356,20 @@ func handleCombineWithHashRequest(w http.ResponseWriter, r *http.Request) {
 func main() {
 	h:=New16()
 	h.Add([]byte("hello"))
-	s1:=string(h.Sum(nil))
-	// h12=s1
-	// fmt.Println("Here is the hash of hello=",s1)
+	s1:=h.Sum(nil)
+	fmt.Println("Here is the hash of hello=",s1)
+	// // h12=s1
+    //fmt.Println("Here is the hash of hello=",s1)
 	h.Add([]byte("world"))
-	// fmt.Println("Here is the hash of helloworld=",string(h.Sum(nil)))
+	fmt.Println("Here is the hash of helloworld=",h.Sum(nil))
 	a:=New16()
 	a.SetState([]byte(s1))
-	hashess:=Makehash(s1,"world")
-	fmt.Println("Here is my answer",hashess)
-	// fmt.Println("Here is the hash of S1=",string(a.Sum(nil)))
-	// fmt.Println("To be compared=",string(h.Sum(nil)))
+	// // hashess:=Makehash(s1,"world")
+	// fmt.Println("Here is my answer",hashess)
+	// // fmt.Println("Here is the hash of S1=",string(a.Sum(nil)))
+	// // fmt.Println("To be compared=",string(h.Sum(nil)))
 	a.Add([]byte("world"))
-	// fmt.Println("Here is the hash of combined=",string(a.Sum(nil)))
+	fmt.Println("Here is the hash of combined=",a.Sum(nil))
 	http.HandleFunc("/combine", handleRequest)
 	http.HandleFunc("/singlehash", handleSingleHashRequest)
 	http.HandleFunc("/combinewithhash", handleCombineWithHashRequest)

@@ -7,6 +7,24 @@ export default function State3Client(requestInfo) {
   const [isS2Confirmed, setIsS2Confirmed] = useState(false);
   const [isDeclined, setIsDeclined] = useState(false);
   const [nowHashS,setNowHashS]=useState("");
+  const [tempS1,setTempS1]=useState();
+
+  function hexStringToUint8Array(hexString) {
+    if (hexString.length % 2 !== 0) {
+      throw new Error("Hex string must have an even number of characters");
+    }
+    if (hexString.startsWith("0x")) {
+      hexString = hexString.slice(2);
+    }
+    const bytes = new Uint8Array(hexString.length / 2);
+
+    for (let i = 0; i < hexString.length; i += 2) {
+      const byteValue = parseInt(hexString.substr(i, 2), 16);
+      bytes[i / 2] = byteValue;
+    }
+
+    return bytes;
+  }
 
   useEffect(() => {
     const fetchInfo = async () => {
@@ -80,13 +98,17 @@ export default function State3Client(requestInfo) {
         .call({
           from: requestInfo.from,
         });
-      console.log("HashS1=",NowHashS1)
+      const bytesArray=hexStringToUint8Array(NowHashS1);
+      const base64String = btoa(
+        String.fromCharCode.apply(null, bytesArray)
+      );
+      console.log("HashS1=",bytesArray)
       console.log("nowS2=",NowS2)
       const data={
-        hashS1:NowHashS1,
+        hashS1:base64String,
         s2:NowS2
       }
-      var calculatedHashS="";
+      var NewCalculatedHashS= new Uint8Array([]);
       fetch("http://localhost:8080/combinewithhash", {
         method: "POST",
         headers: {
@@ -96,23 +118,57 @@ export default function State3Client(requestInfo) {
       })
         .then((response) => response.json())
         .then((data) => {
-          calculatedHashS = data.combinedHash;
-          console.log("OldNewHashS=",calculatedHashS)
-          setNowHashS(calculatedHashS);
+          const calculatedHashS = atob(data.combinedHash);
+          const byteArray = Uint8Array.from(calculatedHashS, (c) =>
+            c.charCodeAt(0)
+          );
+
+          console.log("Here the Obtained Value from BackEnd=", byteArray);
+          //setHashS(calculatedHashS);
+
+          // calculatedHashS = data.combinedHash;
+          console.log("OldNewHashS=", byteArray);
+          // NewCalculatedHashS=byteArray;
+          // for (let i = 0; i < byteArray.length; i++) {
+          //   // Add the element to the global array
+          //   console.log(byteArray[i]);
+          //   // NewCalculatedHashS = new Uint8Array([
+          //   //   ...NewCalculatedHashS,
+          //   //   bytesArray[i],
+          //   // ]);
+          //   // NewCalculatedHashS=NewCalculatedHashS.concat(byteArray[i])
+          // }
+          contract.methods.computeVerdict(byteArray, requestInfo.requestID)
+                .send({
+                    from: requestInfo.from,
+                    gas: 2000000,
+                    gasPrice: 10000000000
+                })
+                .then((Verdict) => {
+                    setIsDeclined(true);
+                    console.log("Here is the Verdict=",Verdict)
+                    // window.location.reload();
+                })
+                .catch((error) => {
+                    console.error("Error calling computeVerdict:", error.message);
+                });
         })
         .catch((error) => {
-          console.error("Error:", error);
+            console.error("Error:", error);
         });
-      console.log("nowHashS=",calculatedHashS);
+          
+          // setNowHashS(calculatedHashS);
+        
+      // console.log("nowHashS=",NewCalculatedHashS);
 
-      const Verdict = await contract.methods
-        .computeVerdict(calculatedHashS,requestInfo.requestID)
-        .send({
-          from: requestInfo.from,
-          gas: 2000000, gasPrice: 10000000000
-        });
-      setIsDeclined(true);
-    //  window.location.reload();
+      // const Verdict = await contract.methods
+      //   .computeVerdict(NewCalculatedHashS,requestInfo.requestID)
+      //   .send({
+      //     from: requestInfo.from,
+      //     gas: 2000000, gasPrice: 10000000000
+      //   });
+      // setIsDeclined(true);
+     window.location.reload();
     } catch (error) {
       console.error("Error declining request:", error.message);
     }

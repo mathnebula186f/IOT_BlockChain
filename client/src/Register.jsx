@@ -8,7 +8,7 @@ const Register = ({ userAccount }) => {
   const [serviceProviderName, setServiceProviderName] = useState("");
   const [serviceName, setServiceName] = useState("");
   const [hashS, setHashS] = useState("");
-
+  const [temp,setTemp]=useState();
    const [s1, setS1] = useState("");
    const [s2, setS2] = useState("");
    const [hhashS, setHhashS] = useState("");
@@ -28,8 +28,13 @@ const Register = ({ userAccount }) => {
      })
        .then((response) => response.json())
        .then((data) => {
-         const calculatedHashS = data.combinedHash;
-         setHashS(calculatedHashS);
+        const calculatedHashS = atob(data.combinedHash);
+        const byteArray = Uint8Array.from(calculatedHashS, (c) => c.charCodeAt(0));
+
+        console.log("Here the Obtained Value from BackEnd=",byteArray);
+         //setHashS(calculatedHashS);
+
+         setTemp(byteArray);
        })
        .catch((error) => {
          console.error("Error:", error);
@@ -53,7 +58,8 @@ const Register = ({ userAccount }) => {
         .registerServiceProvider(
           serviceProviderName,
           serviceName,
-          hashS
+          hashS,
+          temp
         )
         .send({
           from: userAccount,

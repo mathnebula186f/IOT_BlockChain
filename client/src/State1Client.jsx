@@ -5,7 +5,24 @@ import Contract from "./Contract/Contract.json";
 export default function State1Client(requestInfo ) {
   const [hashS1, setHashS1] = useState("");
   const [isHashS1Confirmed, setIsHashS1Confirmed] = useState(false);
+  // const [tempS1,setTempS1]=useState();
 
+  function hexStringToUint8Array(hexString) {
+    if (hexString.length % 2 !== 0) {
+      throw new Error("Hex string must have an even number of characters");
+    }
+    if (hexString.startsWith("0x")) {
+      hexString = hexString.slice(2);
+    }
+    const bytes = new Uint8Array(hexString.length / 2);
+
+    for (let i = 0; i < hexString.length; i += 2) {
+      const byteValue = parseInt(hexString.substr(i, 2), 16);
+      bytes[i / 2] = byteValue;
+    }
+
+    return bytes;
+  }
   useEffect(() => {
     const fetchHashS1 = async () => {
       try {
@@ -27,6 +44,8 @@ export default function State1Client(requestInfo ) {
           .call({
             from: requestInfo.from,
           });
+        // const retrievedDataArray = fetchedHashS1.map((x) => x.toNumber());
+        console.log("Here is the fetched data",hexStringToUint8Array(fetchedHashS1))
         //console.log("requested id=",clientRequestedServiceID)
         //setRequestID(Number(clientRequestID));
         // Update the state with the fetched HashS2

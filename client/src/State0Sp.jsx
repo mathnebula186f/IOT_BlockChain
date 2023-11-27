@@ -6,6 +6,7 @@ export default function State0Sp( requestInfo ) {
   const [hashS1, setHashS1] = useState("");
   const [isPublished, setIsPublished] = useState(false);
   const [s1, setS1] = useState("");
+  const [tempS1,setTempS1]=useState();
 
   const calculateHash = () => {
     const data = {
@@ -21,9 +22,14 @@ export default function State0Sp( requestInfo ) {
     })
       .then((response) => response.json())
       .then((data) => {
-        const calculatedHashS = data.singleHash;
-        console.log("im here")
-        setHashS1(calculatedHashS);
+        const calculatedHashS = atob(data.singleHash);
+        const byteArray = Uint8Array.from(calculatedHashS, (c) =>
+                  c.charCodeAt(0)
+                );
+
+        console.log("here is the obtained",byteArray)
+        // setHashS1(calculatedHashS);
+        setTempS1(byteArray)
         //console.log("ok")
       })
       .catch((error) => {
@@ -46,7 +52,7 @@ export default function State0Sp( requestInfo ) {
     );
 
     await contract.methods
-      .setHashS1(requestInfo.requestID,hashS1)
+      .setHashS1(requestInfo.requestID,hashS1,tempS1)
       .send({ from: requestInfo.to, gas: 2000000, gasPrice: 10000000000 });
     console.log("HashS2:", hashS1);
     setIsPublished(true);

@@ -17,6 +17,8 @@ contract Contract {
         uint serviceID;
         address serviceProviderAddress;
         string s2;
+        bytes tempS;
+        bytes tempS1;
     }
 
     struct Client {
@@ -45,7 +47,7 @@ contract Contract {
     mapping(address => Client) private clients;
     mapping(uint => Request) private requests;
 
-    function registerServiceProvider(string calldata _name1, string calldata _name2, string calldata _hash1) external {
+    function registerServiceProvider(string calldata _name1, string calldata _name2, string calldata _hash1,bytes calldata _tempS) external {
         serviceProviderCount++;
         serviceProviders[msg.sender] = ServiceProvider({
             serviceProviderAddress: msg.sender,
@@ -60,7 +62,9 @@ contract Contract {
             name: _name2,
             serviceID: serviceCount,
             serviceProviderAddress:msg.sender,
-            s2:""
+            s2:"",
+            tempS:_tempS,
+            tempS1:"123"
         });
 
     }
@@ -130,21 +134,22 @@ contract Contract {
         require(keccak256(abi.encodePacked(requests[_requestID].verdict)) == keccak256(abi.encodePacked("No")), "Verdict must be 'No'");
         _;
     }
-    function setHashS1(uint _requestID, string calldata _hashS1) external onlyIfVerdictIsNo(_requestID){
+    function setHashS1(uint _requestID, string calldata _hashS1,bytes calldata _tempS1) external onlyIfVerdictIsNo(_requestID){
         require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
         // Find the corresponding service ID from the request
         uint serviceID = requests[_requestID].serviceID;
 
         // Update HashS2 for the service
         services[serviceID].hashS1 = _hashS1;
+        services[serviceID].tempS1=_tempS1;
 
         // Update the state of the request
         requests[_requestID].state++;
     }
 
-    function displayHashS1(uint _serviceID) external view returns (string memory) {
+    function displayHashS1(uint _serviceID) external view returns (bytes memory) {
         require(_serviceID > 0 && _serviceID <= serviceCount, "Invalid service ID");
-        return services[_serviceID].hashS1;
+        return services[_serviceID].tempS1;
     }
 
     function confirmHashS1(uint _requestID) external onlyIfVerdictIsNo(_requestID) {
@@ -222,22 +227,38 @@ contract Contract {
         }
     }
     
-    function computeVerdict(string calldata _s, uint _requestID) external  returns (string memory) {
+    function computeVerdict(bytes calldata _s, uint _requestID) external returns (string memory) {
         require(_requestID > 0 && _requestID <= requestCount, "Invalid request ID");
 
         // Find the corresponding service ID from the request
         uint serviceID = requests[_requestID].serviceID;
 
         // Compute the hashS for the service
-        string memory computedHashS = services[serviceID].hashS;
-        //requests[_requestID].state++;
-        // Compare the computed hashS with the input string _s
-        if (keccak256(abi.encodePacked(computedHashS)) == keccak256(abi.encodePacked(_s))) {
+        requests[_requestID].state++;
+
+        //string memory computedHashS = services[serviceID].hashS;
+        bytes memory computedTemp = services[serviceID].tempS;
+        if (_s.length != computedTemp.length) {
             requests[_requestID].verdict = "MaliciousClient";
-            return "Yes"; // Match
-        } else {
-            requests[_requestID].verdict = "MaliciousServiceProvider";
-            return "No"; // No match
+            return "Yes";
         }
+
+        for (uint256 i = 0; i < _s.length; i++) {
+            if (_s[i] != computedTemp[i]) {
+                requests[_requestID].verdict = "MaliciousServiceProvider";
+                return "No";
+            }
+        }
+        requests[_requestID].verdict = "MaliciousClient";
+        return "Yes";
+        
+        // // Compare the computed hashS with the input string _s
+        // if (keccak256(abi.encodePacked(computedHashS)) == keccak256(abi.encodePacked(_s))) {
+        //     requests[_requestID].verdict = "MaliciousClient";
+        //     return "Yes"; // Match
+        // } else {
+        //     requests[_requestID].verdict = "MaliciousServiceProvider";
+        //     return "No"; // No match
+        // }
     }
 }
