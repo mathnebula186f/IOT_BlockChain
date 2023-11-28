@@ -73,7 +73,7 @@ const SpHomePage = ({ userAccount }) => {
               serviceID={requestInfo.serviceID}
             />
           ) : (
-            <div>Loading ...</div>
+            <div></div>
           )}
           {requestInfo && Number(requestInfo.state) === 1 ? (
             <State1Sp
@@ -84,7 +84,7 @@ const SpHomePage = ({ userAccount }) => {
               serviceID={requestInfo.serviceID}
             />
           ) : (
-            <div>Loading ...</div>
+            <div></div>
           )}
           {requestInfo && Number(requestInfo.state) === 2 ? (
             <State2Sp
@@ -95,7 +95,7 @@ const SpHomePage = ({ userAccount }) => {
               serviceID={requestInfo.serviceID}
             />
           ) : (
-            <div>Loading ...</div>
+            <div></div>
           )}
           {requestInfo && Number(requestInfo.state) === 3 ? (
             <State3Sp
@@ -106,7 +106,7 @@ const SpHomePage = ({ userAccount }) => {
               serviceID={requestInfo.serviceID}
             />
           ) : (
-            <div>Loading ...</div>
+            <div></div>
           )}
           {requestInfo && Number(requestInfo.state) === 4 ? (
             <VerdictSp 
@@ -114,7 +114,7 @@ const SpHomePage = ({ userAccount }) => {
             to={requestInfo.to}
             />
           ) : (
-            <div> Loading ...</div>
+            <div> </div>
           )}
         </div>
       )}

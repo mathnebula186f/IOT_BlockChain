@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import Web3 from "web3";
+import Lottie from "react-lottie";
+import animationData from "./lottie/register.json"
 import Contract from "./Contract/Contract.json";
 
 const Register = ({ userAccount }) => {
@@ -12,6 +14,15 @@ const Register = ({ userAccount }) => {
    const [s1, setS1] = useState("");
    const [s2, setS2] = useState("");
    const [hhashS, setHhashS] = useState("");
+
+   const lottieOptions = {
+     loop: true,
+     autoplay: true,
+     animationData: animationData,
+     rendererSettings: {
+       preserveAspectRatio: "xMidYMid slice",
+     },
+   };
 
    const calculateHash = () => {
      const data = {
@@ -97,16 +108,17 @@ const Register = ({ userAccount }) => {
   };
 
   return (
-    <div className="container mx-auto mt-8">
-      <h1 className="text-3xl font-bold mb-4">Welcome to Register Page</h1>
-
-      {/* Form for Service Provider */}
-      <form className="mb-8">
+    <div className="container mx-auto mt-8 grid grid-cols-2 gap-4">
+      {/* Service Provider Form */}
+      <form className="col-span-1 mb-8 p-6 border rounded shadow-md bg-white">
+        <h1 className="text-3xl font-bold mb-4 animate-bounce">
+          Register as Service Provider
+        </h1>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-600">
             ServiceProvider Name:
             <input
-              className="form-input mt-1 block w-full"
+              className="form-input mt-1 block w-full border"
               type="text"
               value={serviceProviderName}
               onChange={(e) => setServiceProviderName(e.target.value)}
@@ -117,7 +129,7 @@ const Register = ({ userAccount }) => {
           <label className="block text-sm font-medium text-gray-600">
             Service Name:
             <input
-              className="form-input mt-1 block w-full"
+              className="form-input mt-1 block w-full border"
               type="text"
               value={serviceName}
               onChange={(e) => setServiceName(e.target.value)}
@@ -128,33 +140,55 @@ const Register = ({ userAccount }) => {
           <label className="block text-sm font-medium text-gray-600">
             HashS:
             <input
-              className="form-input mt-1 block w-full"
+              className="form-input mt-1 block w-full border"
               type="text"
               value={hashS}
               onChange={(e) => setHashS(e.target.value)}
             />
           </label>
         </div>
+        {/* ... (Other Service Provider form fields) */}
         <button
           type="button"
           onClick={registerAsServiceProvider}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 animate-pulse"
         >
           Register as Service Provider
         </button>
       </form>
 
-      {/* Form for Client */}
-      <form>
+      {/* Client Form */}
+      <form className="col-span-1 mb-8 p-6 border rounded shadow-md bg-white">
+        <h1 className="text-3xl font-bold mb-4 animate-bounce">Register as Client</h1>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-600">
+            Service Name:
+            <input
+              className="form-input mt-1 block w-full border"
+              type="text"
+              value={serviceName}
+              onChange={(e) => setServiceName(e.target.value)}
+            />
+          </label>
+        </div>
+        {/* ... (Other Client form fields) */}
         <button
           type="button"
           onClick={registerClient}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700"
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 animate-pulse"
         >
           Register as Client
         </button>
       </form>
-      <form>
+
+      {/* Lottie Icon */}
+      <div className="col-span-1 flex justify-center items-center">
+        <Lottie options={lottieOptions} height={400} width={400} />
+      </div>
+
+      {/* Hash Calculator */}
+      <form className="col-span-1 mb-8 p-6 border rounded shadow-md bg-white">
+        <h1 className="text-3xl font-bold mb-4">Hash Calculator</h1>
         <label htmlFor="s1">Input S1:</label>
         <input
           type="text"
@@ -163,6 +197,7 @@ const Register = ({ userAccount }) => {
           value={s1}
           onChange={(e) => setS1(e.target.value)}
           required
+          className="form-input mt-1 block w-full border"
         />
         <br />
 
@@ -174,15 +209,21 @@ const Register = ({ userAccount }) => {
           value={s2}
           onChange={(e) => setS2(e.target.value)}
           required
+          className="form-input mt-1 block w-full border"
         />
         <br />
 
-        <button type="button" onClick={calculateHash}>
+        <button
+          type="button"
+          onClick={calculateHash}
+          className="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-700"
+        >
           Submit
         </button>
+        <div id="result" className="mt-4 ">
+          HashS: {hashS}
+        </div>
       </form>
-
-      <div id="result">HashS: {hashS}</div>
     </div>
   );
 };

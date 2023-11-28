@@ -22,29 +22,29 @@ export default function VerdictSp(requestInfo) {
   return (
     <div>
       {requestInfo && requestInfo.verdict === "Success" ? (
-        <div>Successfully Service Provided to Client</div>
+        <div className="text-2xl">Successfully Service Provided to Client</div>
       ) : (
-        <div>Loading....</div>
+        <div></div>
       )}
       {requestInfo && requestInfo.verdict === "AbortByClient" ? (
-        <div>This Was Aborted By Client</div>
+        <div className="text-2xl">This Was Aborted By Client</div>
       ) : (
-        <div>Loading....</div>
+        <div></div>
       )}
       {requestInfo && requestInfo.verdict === "AbortByServiceProvider" ? (
-        <div>This Was Aborted By ServiceProvider</div>
+        <div className="text-2xl">This Was Aborted By ServiceProvider</div>
       ) : (
-        <div>Loading....</div>
+        <div></div>
       )}
       {requestInfo && requestInfo.verdict === "MaliciousClient" ? (
-        <div>Client is Malicious</div>
+        <div className="text-2xl">Client is Malicious</div>
       ) : (
-        <div>Loading....</div>
+        <div></div>
       )}
       {requestInfo && requestInfo.verdict === "MaliciousServiceProvider" ? (
-        <div>ServiceProvider is Malicious</div>
+        <div className="text-2xl">ServiceProvider is Malicious</div>
       ) : (
-        <div>Loading....</div>
+        <div></div>
       )}
       <button onClick={resetUser}>Go to Homepage</button>
     </div>

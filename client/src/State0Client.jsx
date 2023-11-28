@@ -15,7 +15,7 @@ export default function State0Client(requestInfo){
               <p>From: {requestInfo.from}</p>
               <p>To: {requestInfo.to}</p>
               <p>Service ID: {Number(requestInfo.serviceID)}</p>
-              <h1 className="text-5xl">Waiting for Service Provider to Publish the Hash of S1</h1>
+              <h1 className="text-2xl">Waiting for Service Provider to Publish the Hash of S1</h1>
             </div>
           ) : (
             <p>Loading request information...</p>

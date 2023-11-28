@@ -148,7 +148,7 @@ export default function ClientHomePage({ userAccount }) {
               serviceID={requestInfo.serviceID}
             />
           ) : (
-            <div> Loading ...</div>
+            <div></div>
           )}
           {requestInfo && Number(requestInfo.state) === 1 ? (
             <State1Client
@@ -159,7 +159,7 @@ export default function ClientHomePage({ userAccount }) {
               serviceID={requestInfo.serviceID}
             />
           ) : (
-            <div> Loading ...</div>
+            <div></div>
           )}
           {requestInfo && Number(requestInfo.state) === 2 ? (
             <State2Client
@@ -170,7 +170,7 @@ export default function ClientHomePage({ userAccount }) {
               serviceID={requestInfo.serviceID}
             />
           ) : (
-            <div> Loading ...</div>
+            <div></div>
           )}
           {requestInfo && Number(requestInfo.state) === 3 ? (
             <State3Client
@@ -181,7 +181,7 @@ export default function ClientHomePage({ userAccount }) {
               serviceID={requestInfo.serviceID}
             />
           ) : (
-            <div> Loading ...</div>
+            <div></div>
           )}
           {requestInfo && Number(requestInfo.state) === 4 ? (
             <VerdictClient
@@ -189,7 +189,7 @@ export default function ClientHomePage({ userAccount }) {
               from={requestInfo.from}
             />
           ) : (
-            <div> Loading ...</div>
+            <div></div>
           )}
         </div>
       )}
